@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.apurba Wallpapers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0b0f19;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-nav {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .wallpaper-card {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        }
+        .wallpaper-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.4);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen pb-24">
+
+    <!-- Top Navigation -->
+    <header class="glass-nav sticky top-0 z-40 px-4 py-3.5 flex items-center justify-between max-w-6xl mx-auto">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+                    Mr.apurba
+                </h1>
+                <p class="text-[11px] text-slate-400 uppercase tracking-widest font-semibold -mt-1">Wallpapers</p>
+            </div>
+        </div>
+
+        <!-- Owner Admin Button -->
+        <button onclick="toggleAdminModal()" id="adminBtn" class="px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs font-semibold flex items-center space-x-2 transition">
+            <i class="fa-solid fa-lock text-indigo-400" id="adminIcon"></i>
+            <span id="adminBtnText">Owner Login</span>
+        </button>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 mt-5">
+        
+        <!-- Search & Filter Bar -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-between items-center mb-6">
+            <div class="relative w-full sm:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" oninput="renderWallpapers()" placeholder="Search 4K, AMOLED, Cyber..." 
+                    class="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition">
+            </div>
+
+            <!-- Categories -->
+            <div class="flex space-x-2 overflow-x-auto no-scrollbar w-full sm:w-auto py-1" id="categoryBar">
+                <button onclick="setCategory('All')" class="cat-btn active px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white whitespace-nowrap transition">All</button>
+                <button onclick="setCategory('AMOLED')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white whitespace-nowrap transition">AMOLED</button>
+                <button onclick="setCategory('Cyber & Tech')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white whitespace-nowrap transition">Cyber & Tech</button>
+                <button onclick="setCategory('Gym & Motivation')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white whitespace-nowrap transition">Gym & Motivation</button>
+                <button onclick="setCategory('Nature')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white whitespace-nowrap transition">Nature</button>
+                <button onclick="setCategory('AI Art')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white whitespace-nowrap transition">AI Art</button>
+            </div>
+        </div>
+
+        <!-- Owner Quick Upload Bar (Hidden until logged in) -->
+        <div id="ownerQuickBar" class="hidden mb-6 p-4 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Owner Mode Active (Mr. Apurba)</h3>
+                    <p class="text-xs text-slate-300">You can add new wallpapers or delete existing ones directly from the grid.</p>
+                </div>
+            </div>
+            <div class="flex space-x-2 w-full sm:w-auto">
+                <button onclick="openUploadDialog()" class="flex-1 sm:flex-initial px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30 transition">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Add New Wallpaper</span>
+                </button>
+                <button onclick="logoutAdmin()" class="px-3 py-2 bg-slate-800 hover:bg-red-950/60 text-slate-300 hover:text-red-300 border border-slate-700 rounded-xl text-xs font-semibold transition">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Wallpaper Grid -->
+        <div id="wallpaperGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <!-- Populated by JS -->
+        </div>
+
+    </main>
+
+    <!-- Fullscreen Wallpaper Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4">
+        <button onclick="closePreview()" class="absolute top-5 right-5 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700 transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+
+        <!-- Phone Frame Mockup -->
+        <div class="relative w-full max-w-[320px] aspect-[9/16] rounded-3xl overflow-hidden border-4 border-slate-800 shadow-2xl bg-slate-900">
+            <img id="previewImg" src="" alt="Preview" class="w-full h-full object-cover">
+            
+            <!-- Lockscreen Clock Overlay (Toggleable) -->
+            <div id="clockOverlay" class="absolute inset-x-0 top-12 flex flex-col items-center text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] pointer-events-none">
+                <span class="text-xs uppercase tracking-widest opacity-80">Friday, Oct 16</span>
+                <span class="text-6xl font-extrabold tracking-tight mt-1">11:39</span>
+            </div>
+
+            <!-- Bottom Info Overlay -->
+            <div class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                <span id="previewCat" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white uppercase"></span>
+                <h2 id="previewTitle" class="text-lg font-bold text-white mt-1.5"></h2>
+                <p class="text-xs text-slate-300">By Mr.apurba</p>
+            </div>
+        </div>
+
+        <!-- Preview Actions -->
+        <div class="flex items-center space-x-3 mt-5">
+            <button onclick="toggleClockOverlay()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center space-x-2 transition">
+                <i class="fa-regular fa-clock"></i>
+                <span>Toggle Lockscreen</span>
+            </button>
+            <button id="downloadBtn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-xs font-bold text-white flex items-center space-x-2 shadow-lg shadow-indigo-600/40 transition">
+                <i class="fa-solid fa-download"></i>
+                <span>Download HD</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Owner Login Modal -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white">Owner Dashboard Login</h3>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Enter your owner PIN to upload new wallpapers or manage your gallery. (Default PIN: <strong class="text-indigo-400">1234</strong>)</p>
+            <input type="password" id="pinInput" placeholder="Enter Owner PIN" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm mb-4 focus:outline-none focus:border-indigo-500">
+            <button onclick="verifyAdmin()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition">Unlock Admin Mode</button>
+        </div>
+    </div>
+
+    <!-- Upload Wallpaper Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-cloud-arrow-up text-indigo-400 mr-2"></i>Add New Wallpaper</h3>
+                <button onclick="closeUploadDialog()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Wallpaper Title</label>
+                    <input type="text" id="wpTitle" placeholder="e.g., Neon Cyber Samurai" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Category</label>
+                    <select id="wpCategory" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-white">
+                        <option value="AMOLED">AMOLED</option>
+                        <option value="Cyber & Tech">Cyber & Tech</option>
+                        <option value="Gym & Motivation">Gym & Motivation</option>
+                        <option value="Nature">Nature</option>
+                        <option value="AI Art">AI Art</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Upload from Device</label>
+                    <input type="file" id="wpFile" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600/20 file:text-indigo-400 hover:file:bg-indigo-600/30">
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-3 text-[10px] text-slate-500 uppercase font-bold">OR PASTE IMAGE URL</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
+                </div>
+
+                <div>
+                    <input type="url" id="wpUrl" placeholder="https://images.unsplash.com/..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <button onclick="saveNewWallpaper()" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/30 transition">
+                    Publish to Mr.apurba Wallpapers
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Starter Wallpapers
+        const starterWallpapers = [
+            {
+                id: 1,
+                title: "Neon Cyber Matrix",
+                category: "Cyber & Tech",
+                url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=85"
+            },
+            {
+                id: 2,
+                title: "Dark AMOLED Obsidian",
+                category: "AMOLED",
+                url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=900&q=85"
+            },
+            {
+                id: 3,
+                title: "Iron Discipline",
+                category: "Gym & Motivation",
+                url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=85"
+            },
+            {
+                id: 4,
+                title: "Misty Alpine Peaks",
+                category: "Nature",
+                url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=85"
+            },
+            {
+                id: 5,
+                title: "Synthwave Horizon",
+                category: "AI Art",
+                url: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=900&q=85"
+            },
+            {
+                id: 6,
+                title: "Crimson Eclipse AMOLED",
+                category: "AMOLED",
+                url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=900&q=85"
+            }
+        ];
+
+        let wallpapers = JSON.parse(localStorage.getItem('mrapurba_wallpapers')) || starterWallpapers;
+        let currentCategory = 'All';
+        let isAdmin = false;
+        const OWNER_PIN = "1234"; // Change your PIN here
+
+        function saveToStorage() {
+            localStorage.setItem('mrapurba_wallpapers', JSON.stringify(wallpapers));
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.innerText === cat) {
+                    btn.className = "cat-btn active px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white whitespace-nowrap transition";
+                } else {
+                    btn.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white whitespace-nowrap transition";
+                }
+            });
+            renderWallpapers();
+        }
+
+        function renderWallpapers() {
+            const grid = document.getElementById('wallpaperGrid');
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            grid.innerHTML = '';
+
+            const filtered = wallpapers.filter(wp => {
+                const matchesCat = currentCategory === 'All' || wp.category === currentCategory;
+                const matchesSearch = wp.title.toLowerCase().includes(query) || wp.category.toLowerCase().includes(query);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-sm">No wallpapers found matching your filter.</div>`;
+                return;
+            }
+
+            filtered.forEach(wp => {
+                const card = document.createElement('div');
+                card.className = "wallpaper-card relative group aspect-[9/16] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800/80 cursor-pointer";
+                card.onclick = () => openPreview(wp);
+
+                card.innerHTML = `
+                    <img src="${wp.url}" alt="${wp.title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition flex flex-col justify-end p-3.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">${wp.category}</span>
+                        <h3 class="text-sm font-bold text-white leading-tight truncate">${wp.title}</h3>
+                    </div>
+                    ${isAdmin ? `
+                        <button onclick="event.stopPropagation(); deleteWallpaper(${wp.id})" 
+                            class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-red-600/90 hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition" title="Delete Wallpaper">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    ` : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Preview Modal Functions
+        function openPreview(wp) {
+            document.getElementById('previewImg').src = wp.url;
+            document.getElementById('previewTitle').innerText = wp.title;
+            document.getElementById('previewCat').innerText = wp.category;
+            
+            const dlBtn = document.getElementById('downloadBtn');
+            dlBtn.onclick = () => downloadImage(wp.url, wp.title);
+
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+        }
+
+        function toggleClockOverlay() {
+            const clock = document.getElementById('clockOverlay');
+            clock.classList.toggle('hidden');
+        }
+
+        async function downloadImage(imageSrc, title) {
+            try {
+                const response = await fetch(imageSrc);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Mr_apurba_${title.replace(/\s+/g, '_')}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (e) {
+                window.open(imageSrc, '_blank');
+            }
+        }
+
+        // Owner Admin Functions
+        function toggleAdminModal() {
+            if (isAdmin) {
+                openUploadDialog();
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('pinInput').focus();
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('pinInput').value = '';
+        }
+
+        function verifyAdmin() {
+            const pin = document.getElementById('pinInput').value;
+            if (pin === OWNER_PIN) {
+                isAdmin = true;
+                closeLoginModal();
+                document.getElementById('ownerQuickBar').classList.remove('hidden');
+                document.getElementById('adminBtnText').innerText = "Add Wallpaper";
+                document.getElementById('adminIcon').className = "fa-solid fa-plus text-emerald-400";
+                renderWallpapers();
+            } else {
+                alert("Incorrect Owner PIN!");
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            document.getElementById('ownerQuickBar').classList.add('hidden');
+            document.getElementById('adminBtnText').innerText = "Owner Login";
+            document.getElementById('adminIcon').className = "fa-solid fa-lock text-indigo-400";
+            renderWallpapers();
+        }
+
+        function openUploadDialog() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function closeUploadDialog() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.getElementById('wpTitle').value = '';
+            document.getElementById('wpUrl').value = '';
+            document.getElementById('wpFile').value = '';
+        }
+
+        function saveNewWallpaper() {
+            const title = document.getElementById('wpTitle').value.trim();
+            const category = document.getElementById('wpCategory').value;
+            const fileInput = document.getElementById('wpFile');
+            const urlInput = document.getElementById('wpUrl').value.trim();
+
+            if (!title) {
+                alert("Please enter a wallpaper title.");
+                return;
+            }
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addWallpaperEntry(title, category, e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else if (urlInput) {
+                addWallpaperEntry(title, category, urlInput);
+            } else {
+                alert("Please select an image file or paste an image URL.");
+            }
+        }
+
+        function addWallpaperEntry(title, category, url) {
+            const newWp = {
+                id: Date.now(),
+                title: title,
+                category: category,
+                url: url
+            };
+            wallpapers.unshift(newWp); // Newest first
+            saveToStorage();
+            renderWallpapers();
+            closeUploadDialog();
+        }
+
+        function deleteWallpaper(id) {
+            if (confirm("Remove this wallpaper from Mr.apurba Wallpapers?")) {
+                wallpapers = wallpapers.filter(wp => wp.id !== id);
+                saveToStorage();
+                renderWallpapers();
+            }
+        }
+
+        // Initialize App
+        renderWallpapers();
+    </script>
+</body>
+</html>
